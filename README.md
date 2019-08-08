@@ -77,7 +77,7 @@ kill -9 $pid
 ## 客户端
 
 ```
-$asyncModel = new \Janfish\Phalcon\AsyncCall([
+$asyncModel = new \Janfish\Phalcon\AsyncCall\Client([
     'host' => 'beanstalkd2',
     'port' => '11300',
     'tube' => 'test_tube',
