@@ -13,7 +13,7 @@
 ## 安装
 
 ```
-composer install janfish/asyncCall
+composer require janfish/async-caller
 ```
 
 ## 服务端
