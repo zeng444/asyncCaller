@@ -1,0 +1,237 @@
+
+
+# 消息中间件
+
+## 特性
+
+- 支持多种类型的异步调用或远程调用，远程调用通过消费消息队列的数据实现
+- 支持多进程、平滑重启、平滑停用、支持后台进程化运行
+- 支持任务数配置，当一个进程完成了指定任务后自动平滑重启，回收优化内存使用
+- 支持定义任务指定的解析和自定义执行方式
+
+
+## 安装
+
+```
+composer install janfish/asyncCall
+```
+
+## 服务端
+
+- 启动服务
+
+```php
+$asyncModel = new Janfish\Phalcon\AsyncCall\Server([
+    'host' => 'beanstalkd2',
+    'port' => '11300',
+    'tube' => 'test_tube',
+    'workerNum' => 2,
+    'reserveTimeout' => 2,
+    'maxRequest' => 112111111112,
+    'cron' => 200,
+    'daemonize' => false,
+    'pidFile' => __DIR__.'/.async_task.pid',
+    'logPath' => __DIR__.'/async.log',
+]);
+$asyncModel->start();
+```
+
+| 参数          | 默认| 说明|
+|-----------------|---------------------|----------|
+|  host           | 127.0.0.1           | Beanstalkd服务地址  |
+|  port           | 11300               | Beanstalkd服务端口  |
+|  tube           | async_call_test     | 消费队列名 |
+|  workerNum      | 1                   | 进程数 |
+|  reserveTimeout | 2                   | 读取队列超时时间，单位秒 |
+|  maxRequest     | 1000                | 最大完成任务数，当一个进程达到最大任务数，将平滑重启 |
+|  cron           | 200                 | 定时任务周期，默认200毫秒   |
+|  daemonize      | false               | 是否已后台进程方式运行 |
+|  pidFile        | /tmp/async_task_%d.pid | 运行时pid记录的地址 |
+|  logPath        |                     | 日志文件地址，设置后将写日志 |
+
+- 重启服务
+
+```php
+$asyncModel = new Janfish\Phalcon\AsyncCall\Server([
+    'pidFile' => __DIR__.'/.async_task.pid',
+]);
+$asyncModel->restart();
+```
+- 关闭服务
+
+```php
+$asyncModel = new Janfish\Phalcon\AsyncCall\Server([
+    'pidFile' => __DIR__.'/.async_task.pid',
+]);
+$asyncModel->restart();
+```
+
+- linux命令关闭
+
+> 主进程pid直接kill，子进程会检查自己任务执行完后自行退出
+
+```bash
+kill -9 $pid
+```
+
+## 客户端
+
+```
+$asyncModel = new \Janfish\Phalcon\AsyncCall([
+    'host' => 'beanstalkd2',
+    'port' => '11300',
+    'tube' => 'test_tube',
+]);
+$result = $asyncModel->asyncCall([
+ 'model' => 'Order',
+   'modelParams' => $insuranceQuotation->id,
+   'method' => 'cancel',
+   'delay' => 10,
+   'retryIntervalTime' => 600,
+   'retryStopAt' => date('Y-m-d H:i:s', strtotime('+2 hours')),
+   'forceSync' => false,
+]);
+```
+
+| 参数 | 类型      |必填    |  说明 | 
+|------|----------|------|------|
+|model | string   | 是 |  调用的ORM模型对象名称|
+|modelParams     |  mixed  | 否 | 调用的ORM的条件参数，空字符串，criteria条件，或数字主键ID |
+|method|  string   | 是 |  调用ORM对象的方法|
+|methodParams|   array| 否| 调用的方法参数|
+|delay| int  |  否| 延时执行，单位秒|
+|retryIntervalTime| int   | 否 | 当结果为false延时执行的间隔时间，单位秒|
+|retryStopAt| datetime  | 否| 延时执行的停止执行时间 Y-m-d h:i:s |
+|forceSync| bool  | 否| 强制同步执行,默认false |
+
+## 订制命令解析
+
+- 继承 \Janfish\Phalcon\AsyncCall\Command，并实现其中的方法，定义如何解析和执行收到的消息
+
+```
+<?php
+
+namespace Janfish\Phalcon\AsyncCall\Command;
+
+/**
+ * Author:Robert
+ *
+ * Interface CommandInterface
+ * @package Janfish\Phalcon\AsyncCall\Command
+ */
+interface CommandInterface
+{
+
+    const RELEASE_RESULT_STATUS = 'RELEASE';
+
+    const BURY_RESULT_STATUS = 'BURY';
+
+    const DELETE_RESULT_STATUS = 'DELETE';
+
+    /**
+     * 执行命令
+     * Author:Robert
+     *
+     * @return bool
+     */
+    public function execute(): bool;
+
+    /**
+     * 执行结果数据
+     * Author:Robert
+     *
+     * @return mixed
+     */
+    public function getResultData();
+
+
+    /**
+     * 重发延时
+     * Author:Robert
+     *
+     * @return int
+     */
+    public function getReleaseDelay(): int;
+
+    /**
+     * 执行状态
+     * Author:Robert
+     *
+     * @return string
+     */
+    public function getStatus(): string;
+
+    /**
+     * 执行的对象实例
+     * Author:Robert
+     *
+     * @return mixed
+     */
+    public function getCalledInstance();
+
+
+    /**
+     * Author:Robert
+     *
+     * @return string
+     */
+    public function getError(): string;
+
+    /**
+     * Author:Robert
+     *
+     * @param string $error
+     */
+    public function setError(string $error): void;
+}
+
+```
+
+## 配置服务器使其执行订制的命令
+
+- 服务端：
+
+> 将自定义的解析对象指定给服务器
+
+```php
+$asyncModel = new Janfish\Phalcon\AsyncCall\Server([
+    'host' => 'beanstalkd2',
+    'port' => '11300',
+    'tube' => 'test_tube',
+    'workerNum' => 2,
+    'reserveTimeout' => 2,
+    'maxRequest' => 112111111112,
+    'cron' => 200,
+    'daemonize' => false,
+    'pidFile' => __DIR__.'/.async_task.pid',
+    'logPath' => __DIR__.'/async.log',
+],'\\Core\\Mailler');
+$asyncModel->start();
+```
+
+- 客户端：将自己定义的消息向队列服务器对用的tube中push即可
+
+
+## 开启多套服务
+
+- 只需要定义不同的pid即可
+
+```php
+$asyncModel = new Janfish\Phalcon\AsyncCall\Server([
+    'host' => 'beanstalkd2',
+    'port' => '11300',
+    'tube' => 'test_tube1',
+    'pidFile' => __DIR__.'/.async_task.pid',
+],'\\Core\\Mailler');
+$asyncModel->start();
+```
+
+```php
+$asyncModel = new Janfish\Phalcon\AsyncCall\Server([
+    'host' => 'beanstalkd2',
+    'port' => '11300',
+    'tube' => 'test_tube2',
+    'pidFile' => __DIR__.'/.async_task_2.pid',
+],'\\Core\\Mailler');
+$asyncModel->start();
+```

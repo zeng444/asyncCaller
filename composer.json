@@ -1,0 +1,21 @@
+{
+  "name": "janfish/asyncCall",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Robert",
+      "email": "zeng444@163.com"
+    }
+  ],
+  "require": {
+    "ext-pcntl": "*",
+    "ext-posix": "*",
+    "ext-json": "*",
+    "pda/pheanstalk": "v4.0.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Janfish\\Phalcon\\AsyncCaller\\": "src/"
+    }
+  }
+}
