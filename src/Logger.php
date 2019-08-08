@@ -57,7 +57,9 @@ class Logger
         if ($this->_handler) {
             return fwrite($this->_handler, $this->formatter($msg));
         }
-        echo $this->formatter($msg);
+        if (!$this->_config->getDeamon()) {
+            echo $this->formatter($msg);
+        }
         return true;
     }
 

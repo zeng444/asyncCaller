@@ -66,10 +66,32 @@ class Server
     /**
      * Author:Robert
      *
+     */
+    public function tips(): void
+    {
+        echo PHP_EOL;
+        echo '====================================='.PHP_EOL;
+        echo PHP_EOL;
+        echo ' Async Caller is running'.PHP_EOL;
+        echo PHP_EOL;
+        echo ' Process:'.$this->_config->getWorkerNum().' Cron:'.$this->_config->getCron().' Max Request:'.$this->_config->getMaxRequest().PHP_EOL;
+        if ($this->_config->getLogPath()) {
+            echo ' Log Path:'.$this->_config->getLogPath().PHP_EOL;
+        }
+        echo PHP_EOL;
+        echo '====================================='.PHP_EOL;
+        echo PHP_EOL;
+    }
+
+
+    /**
+     * Author:Robert
+     *
      * @return bool
      */
     public function start(): bool
     {
+        $this->tips();
         $this->pool->on('workStart', array($this, 'todo'));
         return $this->pool->start();
     }

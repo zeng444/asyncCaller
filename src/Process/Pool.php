@@ -143,9 +143,9 @@ class Pool
                 $this->_logger->debug("Master process exited, Sub process [{$worker->pid}] also quit");
                 $worker->exit();
             }
-            $this->_logger->debug('Work '.$worker->pid.' cron job is start');
+            //            $this->_logger->debug('Work '.$worker->pid.' cron job is start');
             $callback($worker);
-            $this->_logger->debug('Work '.$worker->pid.' cron job is end');
+            //            $this->_logger->debug('Work '.$worker->pid.' cron job is end');
         });
     }
 
