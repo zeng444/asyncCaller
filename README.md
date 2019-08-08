@@ -27,7 +27,7 @@ $asyncModel = new Janfish\Phalcon\AsyncCall\Server([
     'tube' => 'test_tube',
     'workerNum' => 2,
     'reserveTimeout' => 2,
-    'maxRequest' => 112111111112,
+    'maxRequest' => 2000,
     'cron' => 200,
     'daemonize' => false,
     'pidFile' => __DIR__.'/.async_task.pid',
@@ -63,7 +63,7 @@ $asyncModel->restart();
 $asyncModel = new Janfish\Phalcon\AsyncCall\Server([
     'pidFile' => __DIR__.'/.async_task.pid',
 ]);
-$asyncModel->restart();
+$asyncModel->stop();
 ```
 
 - linux命令关闭
