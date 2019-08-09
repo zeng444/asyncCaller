@@ -92,13 +92,17 @@ class Pool
      */
     public function monitorWorker(): void
     {
-        while (true) {
+        \Swoole\Process::signal(SIGUSR1, function ($signalNo) {
+            //TODO RELOAD
+            $this->_logger->debug("$signalNo Sub process reloading");
+        });
+        \Swoole\Process::signal(SIGCHLD, function ($signalNo) {
             while ($ret = \Swoole\Process::wait()) {
                 $index = array_search($ret['pid'], $this->process);
-                $this->_logger->debug("Sub process exited, Sub process  [{$ret['pid']}] begin restart");
+                $this->_logger->debug("$signalNo Sub process exited, Sub process  [{$ret['pid']}] begin restart");
                 $this->createWorker($index);
             }
-        }
+        });
     }
 
     /**
