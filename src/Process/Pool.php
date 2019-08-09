@@ -32,6 +32,13 @@ class Pool
     public $process = [];
 
     /**
+     * Author:Robert
+     *
+     * @var array
+     */
+    public $processHandle = [];
+
+    /**
      *
      * @var
      */
@@ -93,8 +100,10 @@ class Pool
     public function monitorWorker(): void
     {
         \Swoole\Process::signal(SIGUSR1, function ($signalNo) {
-            //TODO RELOAD
             $this->_logger->debug("$signalNo Sub process reloading");
+            foreach ($this->processHandle as $processHandle) {
+                $processHandle->write(SIGUSR1);
+            }
         });
         \Swoole\Process::signal(SIGCHLD, function ($signalNo) {
             while ($ret = \Swoole\Process::wait()) {
@@ -114,6 +123,7 @@ class Pool
     {
         $processInfo = new \Swoole\Process([$this, 'workerStartEvent']);
         $this->process[$index] = $processInfo->start();
+        $this->processHandle[$index] = $processInfo;
     }
 
 
@@ -141,8 +151,14 @@ class Pool
             throw new Exception('Event work Start is not exist');
         }
         $loopTime = 0;
+        swoole_event_add($worker->pipe, function () use ($worker, &$loopTime) {
+            if ($worker->read() == SIGUSR1) {
+                $loopTime = $this->config->maxRequest + 1;
+            }
+        });
         \Swoole\Timer::tick($this->config->getCron(), function () use ($worker, &$loopTime, $callback) {
             $loopTime++;
+            echo "执行次数".$loopTime.PHP_EOL;
             if ($loopTime > $this->config->maxRequest || !$this->isRunning()) {
                 $this->_logger->debug("Master process exited, Sub process [{$worker->pid}] also quit");
                 $worker->exit();
