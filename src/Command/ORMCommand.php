@@ -39,7 +39,7 @@ class ORMCommand implements CommandInterface
      *
      * @var int
      */
-    protected $delay = 0;
+    protected $retryIntervalTime = 0;
 
     /**
      * Author:Robert
@@ -85,16 +85,16 @@ class ORMCommand implements CommandInterface
         $this->error = $error;
     }
 
-
     /**
      * Author:Robert
      *
      * @return int
      */
-    public function getReleaseDelay(): int
+    public function getRetryIntervalTime(): int
     {
-        return $this->delay;
+        return $this->retryIntervalTime;
     }
+
 
     /**
      * Author:Robert
@@ -153,8 +153,8 @@ class ORMCommand implements CommandInterface
                     $this->status = CommandInterface::DELETE_RESULT_STATUS;
                     return false;
                 }
-                $this->setError($this->calledInstance->getMessage().' - 重新发布，延时'.$this->commands['delay'].'秒后重新执行');
-                $this->delay = $this->commands['delay'];
+                $this->setError($this->calledInstance->getMessage().' - 重新发布，延时'.$this->commands['retryIntervalTime'].'秒后重新执行');
+                $this->retryIntervalTime = intval($this->commands['retryIntervalTime']);
                 $this->status = CommandInterface::RELEASE_RESULT_STATUS;
                 //            $queueService->release($job, time(), $this->commands['retryIntervalTime']);
                 return false;

@@ -151,7 +151,7 @@ interface CommandInterface
      *
      * @return int
      */
-    public function getReleaseDelay(): int;
+    public function getRetryIntervalTime(): int;
 
     /**
      * 执行状态

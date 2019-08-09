@@ -115,7 +115,7 @@ class Job
                     break;
                 case CommandInterface::RELEASE_RESULT_STATUS:
                     $this->_logger->debug(CommandInterface::RELEASE_RESULT_STATUS.' '.$command->getError().json_encode($data));
-                    $queueService->release($job, time(), $command->getReleaseDelay());
+                    $queueService->release($job, time(), $command->getRetryIntervalTime());
                     break;
                 case CommandInterface::DELETE_RESULT_STATUS:
                     $this->_logger->debug(CommandInterface::DELETE_RESULT_STATUS.json_encode($command->getResultData()).' - '.json_encode($data));
