@@ -11,6 +11,4 @@ namespace Janfish\Phalcon\AsyncCaller;
 interface ModelInterface
 {
     public function getMessage(): string;
-
-    public function execute(): string;
 }
