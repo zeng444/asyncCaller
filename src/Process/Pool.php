@@ -158,14 +158,11 @@ class Pool
         });
         \Swoole\Timer::tick($this->config->getCron(), function () use ($worker, &$loopTime, $callback) {
             $loopTime++;
-            echo "执行次数".$loopTime.PHP_EOL;
             if ($loopTime > $this->config->maxRequest || !$this->isRunning()) {
                 $this->_logger->debug("Master process exited, Sub process [{$worker->pid}] also quit");
                 $worker->exit();
             }
-            //            $this->_logger->debug('Work '.$worker->pid.' cron job is start');
             $callback($worker);
-            //            $this->_logger->debug('Work '.$worker->pid.' cron job is end');
         });
     }
 
