@@ -8,7 +8,9 @@ use Janfish\Phalcon\AsyncCaller\ModelInterface;
  * Author:Robert
  *
  * Class ORM
- * @package Janfish\Phalcon\AsyncCaller\Command
+ *
+ * @property \Janfish\Phalcon\AsyncCaller\ModelInterface $calledInstance
+ * @package \Janfish\Phalcon\AsyncCaller\Command
  */
 class ORMCommand implements CommandInterface
 {
@@ -95,13 +97,12 @@ class ORMCommand implements CommandInterface
         return $this->retryIntervalTime;
     }
 
-
     /**
      * Author:Robert
      *
      * @return bool
      */
-    public function execute(): bool
+    public function getModelInstance()
     {
         if (!isset($this->commands['model']) || !isset($this->commands['method']) || !isset($this->commands['modelParams']) || !isset($this->commands['methodParams'])) {
             $this->status = CommandInterface::BURY_RESULT_STATUS;
@@ -141,25 +142,52 @@ class ORMCommand implements CommandInterface
             $this->setError('Method not exist');
             return false;
         }
-        $this->calledInstance = $model;
+        return $model;
+    }
+
+    /**
+     * 快速调用
+     * Author:Robert
+     *
+     * @return bool
+     */
+    public function call()
+    {
+        $this->calledInstance = $this->getModelInstance();
+        if (!$this->calledInstance) {
+            return false;
+        }
         $this->resultData = call_user_func_array([
             $this->calledInstance,
             $this->commands['method'],
         ], $this->commands['methodParams']);
         if (!$this->resultData) {
+            $this->setError($this->calledInstance->getMessage());
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Author:Robert
+     *
+     * @return bool
+     */
+    public function execute(): bool
+    {
+        if ($this->call()===false) {
             if (isset($this->commands['retryIntervalTime']) && $this->commands['retryIntervalTime'] > 0) {
                 if (isset($this->commands['retryStopAt']) && time() > strtotime($this->commands['retryStopAt'])) {
-                    $this->setError($this->calledInstance->getMessage().' - 重新发布的任务结束，达到最大重试时间点'.$this->commands['retryStopAt']);
+                    $this->setError($this->getError().' - 重新发布的任务结束，达到最大重试时间点'.$this->commands['retryStopAt']);
                     $this->status = CommandInterface::DELETE_RESULT_STATUS;
                     return false;
                 }
-                $this->setError($this->calledInstance->getMessage().' - 重新发布，延时'.$this->commands['retryIntervalTime'].'秒后重新执行');
+                $this->setError($this->getError().' - 重新发布，延时'.$this->commands['retryIntervalTime'].'秒后重新执行');
                 $this->retryIntervalTime = intval($this->commands['retryIntervalTime']);
                 $this->status = CommandInterface::RELEASE_RESULT_STATUS;
-                //            $queueService->release($job, time(), $this->commands['retryIntervalTime']);
                 return false;
             } else {
-                $this->setError($this->calledInstance->getMessage());
+                $this->setError($this->getError());
                 $this->status = CommandInterface::BURY_RESULT_STATUS;
                 return false;
             }

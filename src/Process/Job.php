@@ -110,15 +110,15 @@ class Job
             //统一处理
             switch ($command->getStatus()) {
                 case CommandInterface::BURY_RESULT_STATUS:
-                    $this->_logger->debug(CommandInterface::BURY_RESULT_STATUS.' '.$command->getError().json_encode($data));
+                    $this->_logger->debug(CommandInterface::BURY_RESULT_STATUS.' '.$command->getError().' - '.json_encode($data));
                     $queueService->bury($job);
                     break;
                 case CommandInterface::RELEASE_RESULT_STATUS:
-                    $this->_logger->debug(CommandInterface::RELEASE_RESULT_STATUS.' '.$command->getError().json_encode($data));
+                    $this->_logger->debug(CommandInterface::RELEASE_RESULT_STATUS.' '.$command->getError().' - '.json_encode($data));
                     $queueService->release($job, time(), $command->getRetryIntervalTime());
                     break;
                 case CommandInterface::DELETE_RESULT_STATUS:
-                    $this->_logger->debug(CommandInterface::DELETE_RESULT_STATUS.json_encode($command->getResultData()).' - '.json_encode($data));
+                    $this->_logger->debug(CommandInterface::DELETE_RESULT_STATUS.' '.json_encode($command->getResultData()).' - '.json_encode($data));
                     $queueService->delete($job);
                     break;
             }

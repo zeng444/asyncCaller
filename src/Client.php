@@ -98,6 +98,14 @@ class Client
         if (!isset($params['delay']) || !$params['delay']) {
             $params['delay'] = 0;
         }
+        if (isset($params['retryTimeTable']) && !is_array($params['retryTimeTable'])) {
+            $this->errorMsg = 'retryTimeTable参数错误，请填写数组';
+            return false;
+        }
+        if (isset($params['retryTimeTable']) && (isset($params['retryIntervalTime']) || isset($params['retryStopAt']))) {
+            $this->errorMsg = 'retryTimeTable参数设置后不能再使用retryIntervalTime或retryStopAt参数';
+            return false;
+        }
         if (!isset($params['retryIntervalTime']) || !$params['retryIntervalTime']) {
             $params['retryIntervalTime'] = 0;
         }
@@ -126,7 +134,7 @@ class Client
         }
         if ($params['forceSync'] === true) {
             $cmd = new ORMCommand($params);
-            if (!$cmd->execute()) {
+            if (!$cmd->call()) {
                 $this->errorMsg = $cmd->getError();
             }
             return $cmd->getResultData();
@@ -142,7 +150,13 @@ class Client
             'retryIntervalTime' => $retryIntervalTime,
             'retryStopAt' => $params['retryStopAt'],
         ];
-        $queueService->put(serialize($data), $data['priority'] ?? PheanstalkInterface::DEFAULT_PRIORITY, intval($params['delay']), intval($params['ttr']));
+        if (isset($params['retryTimeTable'])) {
+            foreach ($params['retryTimeTable'] as $time) {
+                $queueService->put(serialize($data), $data['priority'] ?? PheanstalkInterface::DEFAULT_PRIORITY, intval($params['delay']) + intval($time) - time(), intval($params['ttr']));
+            }
+        } else {
+            $queueService->put(serialize($data), $data['priority'] ?? PheanstalkInterface::DEFAULT_PRIORITY, intval($params['delay']), intval($params['ttr']));
+        }
         return true;
     }
 }

@@ -11,8 +11,12 @@ $asyncModel = new AsyncCallerClient([
 $result = $asyncModel->asyncCall([
     'model' => '\Janfish\Phalcon\AsyncCaller\Test',
     'method' => 'test',
+    'forceSync' => false,
+    'modelParams' => 1,
+        'delay' => 2,
+    'retryTimeTable' => [time() + 10, time() + 20, time() + 30],
     //    'retryIntervalTime' => '5',
-    //    'retryStopAt' => date('Y-m-d H:i:s', time() + 20),
+//        'retryStopAt' => date('Y-m-d H:i:s', time() + 20),
 ]);
 
 if (!$result) {
