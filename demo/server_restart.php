@@ -7,12 +7,12 @@ try {
         'host' => 'beanstalkd2',
         'tube' => 'test2',
         'workerNum' => 2,
-        'daemonize' => false,
+        'daemonize' => true,
         'pidFile' => __DIR__.'/.async_task.pid',
 //        'pidFile' => __DIR__.'/.async_task.pid',
         'reserveTimeout' => 2,
     ]);
-    var_dump($asyncModel->restart());
+    $asyncModel->restart();
 } catch (Exception $e) {
     echo $e->getMessage().PHP_EOL.$e->getTraceAsString().PHP_EOL;
 }

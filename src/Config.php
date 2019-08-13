@@ -171,7 +171,7 @@ class Config
     }
 
 
-    public function getDeamon(): bool
+    public function getDeamonize(): bool
     {
         return $this->daemonize;
     }

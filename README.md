@@ -236,4 +236,27 @@ $asyncModel = new Janfish\Phalcon\AsyncCall\Server([
     'pidFile' => __DIR__.'/.async_task_2.pid',
 ],'\\Core\\Mailler');
 $asyncModel->start();
+
 ```
+
+## docker 下运行
+
+- docker下运行无法平滑重启和关闭的问题，原因是非进程模式下运行asyncCaller是使用容器内PID=1进程的，docker下默认PID=1进程不处理发起的sigterm信息的
+- 解决方案是docker挂起命令以下script脚本，然后此脚本会运行在PID=1下，asyncCaller运行在其他PID，就可以正常接收信号了
+
+
+```bash
+#!/bin/bash
+FOLDER=/data/asyncCallerHub/demo
+CMD=${FOLDER}/server_start.php
+LOG_FILE=${FOLDER}/async.log
+php -f ${CMD}
+tail -f ${LOG_FILE}
+```
+
+然后是平滑重启
+
+```
+docker exec -d  swoole-cli php /data/asyncCallerHub/demo/server_restart.php
+```
+

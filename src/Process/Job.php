@@ -47,6 +47,10 @@ class Job
      */
     private $_logger;
 
+
+    const RECONNECTION_COUNT = 2;
+
+
     /**
      * Job constructor.
      * @param Config $config
@@ -73,7 +77,7 @@ class Job
             return $this->connection;
         } catch (\Exception $e) {
             $this->_logger->debug('connection queue server error , reconnection after 1 second');
-            sleep(2);
+            sleep(self::RECONNECTION_COUNT);
             return $this->getConnection();
         }
     }
