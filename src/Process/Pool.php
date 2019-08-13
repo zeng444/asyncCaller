@@ -73,7 +73,7 @@ class Pool
      */
     private function genPidFile(): string
     {
-        return '/tmp/async_task_'.crc32(uniqid(true)).'.pid';
+        return '/tmp/async_task_'.crc32(__FILE__).'.pid';
     }
 
     /**
@@ -84,7 +84,7 @@ class Pool
      */
     public function start()
     {
-        if ($this->config->getDeamon()) {
+        if ($this->config->getDeamonize()) {
             \Swoole\Process::daemon();
         }
         $this->setPid(posix_getpid());
