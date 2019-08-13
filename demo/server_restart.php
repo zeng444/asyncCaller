@@ -1,5 +1,6 @@
 <?php
-include_once '../vendor/autoload.php';
+define('ROOT_PATH', dirname(__DIR__).DIRECTORY_SEPARATOR);
+include_once ROOT_PATH.'vendor/autoload.php';
 
 try {
     $asyncModel = new Janfish\Phalcon\AsyncCaller\Server([
