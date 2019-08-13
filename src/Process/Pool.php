@@ -101,7 +101,7 @@ class Pool
      * @param $callback
      * @throws \Exception
      */
-    public function processExitedSignal($callback)
+    private function processExitedSignal($callback)
     {
         if (!is_callable($callback)) {
             throw new \Exception('process exit signal callback not avalbas');
