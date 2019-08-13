@@ -9,6 +9,7 @@ try {
         'workerNum' => 2,
         'daemonize' => false,
         'pidFile' => __DIR__.'/.async_task.pid',
+//        'pidFile' => __DIR__.'/.async_task.pid',
         'reserveTimeout' => 2,
     ]);
     var_dump($asyncModel->restart());

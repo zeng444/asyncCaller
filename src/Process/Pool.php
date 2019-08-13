@@ -79,6 +79,8 @@ class Pool
     /**
      * Author:Robert
      *
+     * @return bool
+     * @throws \Exception
      */
     public function start()
     {
@@ -89,16 +91,41 @@ class Pool
         for ($index = 0; $index < $this->config->getWorkerNum(); $index++) {
             $this->createWorker($index);
         }
-        \Swoole\Timer::tick(10, function () {
-            //Empty placeholder
-        });
         $this->monitorWorker();
         return true;
+    }
+
+    /**'
+     * Author:Robert
+     *
+     * @param $callback
+     * @throws \Exception
+     */
+    public function processExitedSignal($callback)
+    {
+        if (!is_callable($callback)) {
+            throw new \Exception('process exit signal callback not avalbas');
+        }
+        //Hack for swoole >= 4.4.0 ,
+        if (version_compare(SWOOLE_VERSION, '4.4.0', '<')) {
+            \Swoole\Process::signal(SIGCHLD, function ($signalNo) use ($callback) {
+                while ($ret = \Swoole\Process::wait(false)) {
+                    $callback($ret['pid'], $signalNo);
+                }
+            });
+        } else {
+            while (true) {
+                while ($ret = \Swoole\Process::wait(false)) {
+                    $callback($ret['pid'], SIGCHLD);
+                }
+            }
+        }
     }
 
     /**
      * Author:Robert
      *
+     * @throws \Exception
      */
     public function monitorWorker(): void
     {
@@ -108,24 +135,11 @@ class Pool
                 $processHandle->write(SIGUSR1);
             }
         });
-        // hack for swoole >= 4.4.0 ,
-        if (version_compare(SWOOLE_VERSION, '4.4.0', '<')) {
-            \Swoole\Process::signal(SIGCHLD, function ($signalNo) {
-                while ($ret = \Swoole\Process::wait(false)) {
-                    $this->_logger->debug("$signalNo Sub process exited, Sub process  [{$ret['pid']}] begin restart");
-                    $index = array_search($ret['pid'], $this->process);
-                    $this->createWorker($index);
-                }
-            });
-        } else {
-            while (true) {
-                while ($ret = \Swoole\Process::wait(false)) {
-                    $this->_logger->debug("Sub process exited, Sub process  [{$ret['pid']}] begin restart");
-                    $index = array_search($ret['pid'], $this->process);
-                    $this->createWorker($index);
-                }
-            }
-        }
+        $this->processExitedSignal(function ($pid, $signalNo) {
+            $this->_logger->debug("$signalNo Sub process exited, Sub process  [{$pid}] begin restart");
+            $index = array_search($pid, $this->process);
+            $this->createWorker($index);
+        });
     }
 
     /**
