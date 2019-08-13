@@ -55,9 +55,13 @@ class Server
      * Server constructor.
      * @param array $options
      * @param string $commandType
+     * @throws \Exception
      */
     public function __construct(array $options = [], $commandType = '\\Janfish\\Phalcon\\AsyncCaller\\Command\\ORMCommand')
     {
+        if (!extension_loaded('swoole')) {
+            throw new \Exception('sorry ,your haven\'t installed swoole extension yet.');
+        }
         $this->_config = Config::getInstance($options);
         $this->job = new Job($this->_config, $commandType);
         $this->pool = new Pool($this->_config);

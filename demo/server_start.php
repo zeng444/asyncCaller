@@ -11,10 +11,10 @@ try {
         'maxRequest' => 50000,
         'cron' => 100,
         'daemonize' => false,
-//        'pidFile' => __DIR__.'/.async_task.pid',
-//        'logPath' => __DIR__.'/async.log',
+        //        'pidFile' => __DIR__.'/.async_task.pid',
+        //        'logPath' => __DIR__.'/async.log',
     ]);
     $asyncModel->start();
 } catch (Exception $e) {
-    echo $e->getTraceAsString();
+    echo $e->getMessage().PHP_EOL.$e->getTraceAsString().PHP_EOL;
 }

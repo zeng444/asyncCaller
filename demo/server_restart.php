@@ -12,5 +12,5 @@ try {
     ]);
     var_dump($asyncModel->restart());
 } catch (Exception $e) {
-    echo $e->getTraceAsString();
+    echo $e->getMessage().PHP_EOL.$e->getTraceAsString().PHP_EOL;
 }
