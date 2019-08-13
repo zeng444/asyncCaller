@@ -78,15 +78,16 @@ kill -9 $pid
 
 ```
 $asyncModel = new \Janfish\Phalcon\AsyncCall\Client([
-    'host' => 'beanstalkd2',
+    'host' => 'beanstalkd',
     'port' => '11300',
     'tube' => 'test_tube',
 ]);
 $result = $asyncModel->asyncCall([
- 'model' => 'Order',
+   'model' => 'Order',
    'modelParams' => $insuranceQuotation->id,
    'method' => 'cancel',
    'delay' => 10,
+   'retryTimeTable' =>  [time() + 10, time() + 120, time() + 3600]
    'retryIntervalTime' => 600,
    'retryStopAt' => date('Y-m-d H:i:s', strtotime('+2 hours')),
    'forceSync' => false,
@@ -100,6 +101,7 @@ $result = $asyncModel->asyncCall([
 |method|  string   | 是 |  调用ORM对象的方法|
 |methodParams|   array| 否| 调用的方法参数|
 |delay| int  |  否| 延时执行，单位秒|
+|retryTimeTable   | int   | 否 | 按指定时刻表重复运行任务，当此参数填写时，禁止使用retryIntervalTime和retryStopAt参数，单位秒|
 |retryIntervalTime| int   | 否 | 当结果为false延时执行的间隔时间，单位秒|
 |retryStopAt| datetime  | 否| 延时执行的停止执行时间 Y-m-d h:i:s |
 |forceSync| bool  | 否| 强制同步执行,默认false |
