@@ -73,7 +73,7 @@ class Job
             return $this->connection;
         } catch (\Exception $e) {
             $this->_logger->debug('connection queue server error , reconnection after 1 second');
-            sleep(1);
+            sleep(2);
             return $this->getConnection();
         }
     }
@@ -128,6 +128,5 @@ class Job
             $queueService->release($job, time(), 10);
             return false;
         }
-
     }
 }

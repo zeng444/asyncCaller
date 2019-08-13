@@ -74,6 +74,8 @@ class Server
         echo PHP_EOL;
         echo ' Async Caller is running'.PHP_EOL;
         echo PHP_EOL;
+        echo ' PHP Ver:'.PHP_VERSION.' Swoole Ver:'.SWOOLE_VERSION.PHP_EOL;
+        echo PHP_EOL;
         echo ' Process:'.$this->_config->getWorkerNum().' Cron:'.$this->_config->getCron().' Max Request:'.$this->_config->getMaxRequest().PHP_EOL;
         if ($this->_config->getLogPath()) {
             echo ' Log Path:'.$this->_config->getLogPath().PHP_EOL;
@@ -130,6 +132,4 @@ class Server
     {
         $this->job->start();
     }
-
-
 }

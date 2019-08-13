@@ -30,7 +30,6 @@ class Logger
         if ($this->_config->logPath) {
             $this->_handler = fopen($file, 'ab');
         }
-
     }
 
     /**

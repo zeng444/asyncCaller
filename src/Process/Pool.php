@@ -73,7 +73,7 @@ class Pool
      */
     private function genPidFile(): string
     {
-        return 'tmp/async_task_'.crc32(uniqid(true)).'.pid';
+        return '/tmp/async_task_'.crc32(uniqid(true)).'.pid';
     }
 
     /**
@@ -89,6 +89,9 @@ class Pool
         for ($index = 0; $index < $this->config->getWorkerNum(); $index++) {
             $this->createWorker($index);
         }
+        \Swoole\Timer::tick(10, function () {
+            //Empty placeholder
+        });
         $this->monitorWorker();
         return true;
     }
@@ -105,13 +108,24 @@ class Pool
                 $processHandle->write(SIGUSR1);
             }
         });
-        \Swoole\Process::signal(SIGCHLD, function ($signalNo) {
-            while ($ret = \Swoole\Process::wait()) {
-                $index = array_search($ret['pid'], $this->process);
-                $this->_logger->debug("$signalNo Sub process exited, Sub process  [{$ret['pid']}] begin restart");
-                $this->createWorker($index);
+        // hack for swoole >= 4.4.0 ,
+        if (version_compare(SWOOLE_VERSION, '4.4.0', '<')) {
+            \Swoole\Process::signal(SIGCHLD, function ($signalNo) {
+                while ($ret = \Swoole\Process::wait(false)) {
+                    $this->_logger->debug("$signalNo Sub process exited, Sub process  [{$ret['pid']}] begin restart");
+                    $index = array_search($ret['pid'], $this->process);
+                    $this->createWorker($index);
+                }
+            });
+        } else {
+            while (true) {
+                while ($ret = \Swoole\Process::wait(false)) {
+                    $this->_logger->debug("Sub process exited, Sub process  [{$ret['pid']}] begin restart");
+                    $index = array_search($ret['pid'], $this->process);
+                    $this->createWorker($index);
+                }
             }
-        });
+        }
     }
 
     /**
@@ -230,5 +244,4 @@ class Pool
         }
         return $pid;
     }
-
 }

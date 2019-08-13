@@ -9,6 +9,7 @@
   ],
   "require": {
     "ext-posix": "*",
+    "ext-swoole": "*",
     "ext-json": "*",
     "pda/pheanstalk": "v4.0.0"
   },
