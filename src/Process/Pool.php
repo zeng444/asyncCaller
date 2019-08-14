@@ -84,6 +84,9 @@ class Pool
      */
     public function start()
     {
+        if ($this->isRunning()) {
+            return false;
+        }
         if ($this->config->getDeamonize()) {
             \Swoole\Process::daemon();
         }
@@ -237,8 +240,11 @@ class Pool
             return false;
         }
         $pid = $this->getPid();
+        if (!\Swoole\Process::kill($pid, SIGTERM)) {
+            return false;
+        }
         @unlink($this->_pidFile);
-        return \Swoole\Process::kill($pid, SIGTERM);
+        return true;
     }
 
 

@@ -94,18 +94,24 @@ class Server
      * Author:Robert
      *
      * @return bool
+     * @throws \Exception
      */
     public function start(): bool
     {
-        $this->tips();
+
         $this->pool->on('workStart', array($this, 'todo'));
-        return $this->pool->start();
+        if (!$this->pool->start()) {
+            return false;
+        }
+        $this->tips();
+        return true;
     }
 
     /**
      * Author:Robert
      *
      * @return bool
+     * @throws \Exception
      */
     public function restart(): bool
     {
