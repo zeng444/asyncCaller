@@ -119,14 +119,21 @@ class Config
     /**
      * Author:Robert
      *
-     * @return string
+     * @return array
      */
-    public function getQueueTube(): string
+    public function getQueueTube(): array
     {
-        if ($this->queueTube) {
-            return crc32($this->queueTube);
+        if (!$this->queueTube) {
+            $this->queueTube = uniqid();
         }
-        return crc32(uniqid());
+        if (!is_array($this->queueTube)) {
+            $this->queueTube = [$this->queueTube];
+        }
+        foreach ($this->queueTube as &$queueTube) {
+            $queueTube = crc32($queueTube);
+        }
+        return $this->queueTube;
+
     }
 
     /**

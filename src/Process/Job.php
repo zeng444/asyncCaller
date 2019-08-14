@@ -71,15 +71,21 @@ class Job
      */
     public function getConnection(): Pheanstalk
     {
-        try {
-            $this->connection = Pheanstalk::create($this->_config->getHost(), $this->_config->getPort());
-            $this->connection->watch($this->_config->getQueueTube());
-            return $this->connection;
-        } catch (\Exception $e) {
-            $this->_logger->debug('connection queue server error , reconnection after 1 second');
-            sleep(self::RECONNECTION_COUNT);
-            return $this->getConnection();
+
+        $this->connection = Pheanstalk::create($this->_config->getHost(), $this->_config->getPort());
+        $tubes = $this->_config->getQueueTube();
+        foreach ($tubes as $tube) {
+            $this->connection->watch($tube);
         }
+        if ($tubes) {
+            $this->connection->ignore('default');
+        }
+        return $this->connection;
+
+        //            $this->_logger->debug('connection queue server error , reconnection after '.self::RECONNECTION_COUNT.' second');
+        //            sleep(self::RECONNECTION_COUNT);
+        //            return $this->getConnection();
+
     }
 
     /**

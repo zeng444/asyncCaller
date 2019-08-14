@@ -43,13 +43,6 @@ class Server
      */
     protected $job;
 
-    /**
-     * Author:Robert
-     *
-     * @var
-     */
-    protected $daemonize;
-
 
     /**
      * Server constructor.
@@ -74,18 +67,17 @@ class Server
     public function tips(): void
     {
         echo PHP_EOL;
-        echo '====================================='.PHP_EOL;
-        echo PHP_EOL;
-        echo ' Async Caller is running'.PHP_EOL;
+        echo '==============================================='.PHP_EOL;
         echo PHP_EOL;
         echo ' PHP Ver:'.PHP_VERSION.' Swoole Ver:'.SWOOLE_VERSION.PHP_EOL;
         echo PHP_EOL;
         echo ' Process:'.$this->_config->getWorkerNum().' Cron:'.$this->_config->getCron().' Max Request:'.$this->_config->getMaxRequest().PHP_EOL;
+        echo PHP_EOL;
         if ($this->_config->getLogPath()) {
             echo ' Log Path:'.$this->_config->getLogPath().PHP_EOL;
         }
         echo PHP_EOL;
-        echo '====================================='.PHP_EOL;
+        echo '==============================================='.PHP_EOL;
         echo PHP_EOL;
     }
 
@@ -93,17 +85,22 @@ class Server
     /**
      * Author:Robert
      *
+     * @param bool $tips
      * @return bool
      * @throws \Exception
      */
-    public function start(): bool
+    public function start($tips = true): bool
     {
-
+        if($tips){
+            $this->tips();
+        }
         $this->pool->on('workStart', array($this, 'todo'));
         if (!$this->pool->start()) {
+            if($tips){
+                echo "AsyncCaller is running,pid is {$this->pool->getPid()},startup failed.........".PHP_EOL.PHP_EOL;
+            }
             return false;
         }
-        $this->tips();
         return true;
     }
 
