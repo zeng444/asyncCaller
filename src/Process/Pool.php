@@ -121,6 +121,7 @@ class Pool
                 while ($ret = \Swoole\Process::wait(false)) {
                     $callback($ret['pid'], SIGCHLD);
                 }
+                usleep(20000);
             }
         }
     }

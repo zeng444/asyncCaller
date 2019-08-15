@@ -140,7 +140,7 @@ class Client
             return $cmd->getResultData();
         }
         $queueService = $this->getConnection();
-        $queueService->useTube($this->_config->getQueueTube());
+        $queueService->useTube($this->_config->getQueueTube()[0]);
         $data = [
             'model' => $params['model'],
             'method' => $params['method'],
