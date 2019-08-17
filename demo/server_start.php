@@ -11,7 +11,7 @@ try {
         'reserveTimeout' => 2,
         'maxRequest' => 50000,
         'cron' => 100,
-        'daemonize' => true,
+        'daemonize' => false,
         'pidFile' => __DIR__.'/.async_task.pid',
         'logPath' => __DIR__.'/async.log',
     ]);

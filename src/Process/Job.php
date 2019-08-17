@@ -104,17 +104,17 @@ class Job
         $data = $job->getData();
         try {
             if (!$data || !$data = unserialize($data)) {
-                $this->_logger->debug('参数为空无法解析当前调用');
+                $this->_logger->debug('Command params is not null');
                 $queueService->bury($job);
                 return false;
             }
             $com = $this->commandType;
             if (!class_exists($com)) {
-                throw new \Exception('无法调用的方法');
+                throw new \Exception('Command class is not exist');
             }
             $command = new $com($data);
             if (!$command instanceof CommandInterface) {
-                throw new \Exception('无法调用的方法');
+                throw new \Exception('Command method is not exist');
             }
             $command->execute();
             //统一处理

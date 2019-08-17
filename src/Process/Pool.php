@@ -118,6 +118,7 @@ class Pool
             });
         } else {
             while (true) {
+                usleep(20000);
                 while ($ret = \Swoole\Process::wait(false)) {
                     $callback($ret['pid'], SIGCHLD);
                 }
@@ -133,7 +134,7 @@ class Pool
     public function monitorWorker(): void
     {
         \Swoole\Process::signal(SIGUSR1, function ($signalNo) {
-            $this->_logger->debug("$signalNo Sub process reloading");
+            $this->_logger->debug("$signalNo Sub process begin to reload");
             foreach ($this->processHandle as $processHandle) {
                 $processHandle->write(SIGUSR1);
             }
@@ -189,7 +190,11 @@ class Pool
         });
         \Swoole\Timer::tick($this->config->getCron(), function () use ($worker, &$loopTime, $callback) {
             $loopTime++;
-            if ($loopTime > $this->config->maxRequest || !$this->isRunning()) {
+            if ($loopTime > $this->config->maxRequest) {
+                $this->_logger->debug("Sub process [{$worker->pid}] exited, because it have reached the max request");
+                $worker->exit();
+            }
+            if (!$this->isRunning()) {
                 $this->_logger->debug("Master process exited, Sub process [{$worker->pid}] also quit");
                 $worker->exit();
             }
