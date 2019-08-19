@@ -2,7 +2,7 @@
 
 namespace Janfish\Phalcon\AsyncCaller\Process;
 
-use Janfish\Phalcon\AsyncCaller\Command\ORMModelInterface;
+use Janfish\Phalcon\AsyncCaller\Command\CommandInterface;
 use Janfish\Phalcon\AsyncCaller\Config;
 use Janfish\Phalcon\AsyncCaller\Logger;
 use Pheanstalk\Exception;
