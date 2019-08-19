@@ -129,11 +129,11 @@ class Config
         if (!is_array($this->queueTube)) {
             $this->queueTube = [$this->queueTube];
         }
-        foreach ($this->queueTube as &$queueTube) {
-            $queueTube = crc32($queueTube);
+        $queueTubes = [];
+        foreach ($this->queueTube as $queueTube) {
+            $queueTubes[] = crc32($queueTube);
         }
-        return $this->queueTube;
-
+        return $queueTubes;
     }
 
     /**
