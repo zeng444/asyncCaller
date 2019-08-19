@@ -8,7 +8,7 @@ namespace Janfish\Phalcon\AsyncCaller\Command;
  *
  * Class ORM
  *
- * @property \Janfish\Phalcon\AsyncCaller\ModelInterface $calledInstance
+ * @property \Janfish\Phalcon\AsyncCaller\Command\ORMModelInterface $calledInstance
  * @package \Janfish\Phalcon\AsyncCaller\Command
  */
 class ORMCommand implements CommandInterface
