@@ -2,7 +2,6 @@
 
 namespace Janfish\Phalcon\AsyncCaller\Command;
 
-use Janfish\Phalcon\AsyncCaller\ModelInterface;
 
 /**
  * Author:Robert
@@ -109,21 +108,21 @@ class ORMCommand implements CommandInterface
             $this->setError('参数不完整，无法解析当前当前调用');
             return false;
         }
+        if (!$this->commands['methodParams'] || !is_array($this->commands['methodParams'])) {
+            $this->commands['methodParams'] = [];
+        }
         if (!$this->commands['model'] || !$this->commands['method']) {
             $this->status = CommandInterface::BURY_RESULT_STATUS;
             $this->setError('参数为空，无法解析当前当前调用');
             return false;
-        }
-        if (!$this->commands['methodParams'] || !is_array($this->commands['methodParams'])) {
-            $this->commands['methodParams'] = [];
         }
         if (class_exists($this->commands['model']) === false) {
             $this->status = CommandInterface::BURY_RESULT_STATUS;
             $this->setError('Model not exist');
             return false;
         }
-        if ($this->commands['methodParams']) {
-            $model = call_user_func_array($this->commands['model'].'::findFirst', [$this->commands['methodParams']]);
+        if (isset($this->commands['modelParams']) && $this->commands['modelParams']) {
+            $model = call_user_func_array($this->commands['model'].'::findFirst', [$this->commands['modelParams']]);
         } else {
             $model = new $this->commands['model']();
         }
@@ -132,9 +131,9 @@ class ORMCommand implements CommandInterface
             $this->setError('Model not exist');
             return false;
         }
-        if (!$model instanceof ModelInterface) {
+        if (!$model instanceof ORMModelInterface) {
             $this->status = CommandInterface::BURY_RESULT_STATUS;
-            $this->setError('Illegal model,your instance must implement from \Janfish\Phalcon\AsyncCaller\ModelInterface');
+            $this->setError('Illegal model,your instance must implement from \Janfish\Phalcon\AsyncCaller\Command\ORMModelInterface');
             return false;
         }
         if (method_exists($model, $this->commands['method']) === false) {
@@ -175,7 +174,7 @@ class ORMCommand implements CommandInterface
      */
     public function execute(): bool
     {
-        if ($this->call()===false) {
+        if ($this->call() === false) {
             if (isset($this->commands['retryIntervalTime']) && $this->commands['retryIntervalTime'] > 0) {
                 if (isset($this->commands['retryStopAt']) && time() > strtotime($this->commands['retryStopAt'])) {
                     $this->setError($this->getError().' - 重新发布的任务结束，达到最大重试时间点'.$this->commands['retryStopAt']);
