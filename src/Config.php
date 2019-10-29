@@ -2,6 +2,12 @@
 
 namespace Janfish\Phalcon\AsyncCaller;
 
+/**
+ * Author:Robert
+ *
+ * Class Config
+ * @package Janfish\Phalcon\AsyncCaller
+ */
 class Config
 {
 
@@ -84,7 +90,8 @@ class Config
     public function __construct(array $options = [])
     {
         if (isset($options['tube'])) {
-            $this->queueTube = $options['tube'];
+            print_r($options['tube']);
+            $this->queueTube = $this->setQueueTube($options['tube']);
         }
         if (isset($options['cron'])) {
             $this->cron = $options['cron'];
@@ -119,21 +126,31 @@ class Config
     /**
      * Author:Robert
      *
+     * @param $tubes
+     * @return array|string
+     */
+    private function setQueueTube($tubes): array
+    {
+        if (!$tubes) {
+            $tubes = uniqid();
+        }
+        if (!is_array($tubes)) {
+            $tubes = [$tubes];
+        }
+        foreach ($tubes as &$tube) {
+            $tube = crc32($tube);
+        }
+        return $tubes;
+    }
+
+    /**
+     * Author:Robert
+     *
      * @return array
      */
     public function getQueueTube(): array
     {
-        if (!$this->queueTube) {
-            $this->queueTube = uniqid();
-        }
-        if (!is_array($this->queueTube)) {
-            $this->queueTube = [$this->queueTube];
-        }
-        $queueTubes = [];
-        foreach ($this->queueTube as $queueTube) {
-            $queueTubes[] = crc32($queueTube);
-        }
-        return $queueTubes;
+        return $this->queueTube;
     }
 
     /**
