@@ -90,7 +90,6 @@ class Config
     public function __construct(array $options = [])
     {
         if (isset($options['tube'])) {
-            print_r($options['tube']);
             $this->queueTube = $this->setQueueTube($options['tube']);
         }
         if (isset($options['cron'])) {
