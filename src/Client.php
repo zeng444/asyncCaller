@@ -146,6 +146,7 @@ class Client
             'method' => $params['method'],
             'modelParams' => $params['modelParams'],
             'methodParams' => $params['methodParams'],
+            'errorRetry' =>  $params['errorRetry'] ?? false,
             'priority' => time(),
             'retryIntervalTime' => $retryIntervalTime,
             'retryStopAt' => $params['retryStopAt'],

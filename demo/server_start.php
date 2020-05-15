@@ -13,7 +13,7 @@ try {
         'cron' => 100,
         'daemonize' => false,
         'pidFile' => __DIR__.'/.async_task.pid',
-        'logPath' => __DIR__.'/async.log',
+//        'logPath' => __DIR__.'/async.log',
     ]);
     $asyncModel->start();
 } catch (Exception $e) {

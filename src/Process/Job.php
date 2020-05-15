@@ -134,8 +134,13 @@ class Job
             }
             return true;
         } catch (\Exception $e) {
-            $this->_logger->debug(CommandInterface::RELEASE_RESULT_STATUS."Exception ".$e->getTraceAsString().' - '.json_encode($data));
-            $queueService->release($job, time(), 10);
+            if($data['errorRetry']!==false){
+                $this->_logger->debug(CommandInterface::RELEASE_RESULT_STATUS."Exception ".$e->getTraceAsString().' - '.json_encode($data));
+                $queueService->release($job, time(), 10);
+            }else{
+                $this->_logger->debug(CommandInterface::BURY_RESULT_STATUS."Exception ".$e->getTraceAsString().' - '.json_encode($data));
+                $queueService->bury($job);
+            }
             return false;
         }
     }
