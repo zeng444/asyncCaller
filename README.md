@@ -136,6 +136,8 @@ $result = $asyncModel->asyncCall([
    'retryIntervalTime' => 600,
    'retryStopAt' => date('Y-m-d H:i:s', strtotime('+2 hours')),
    'forceSync' => false,
+   'ttr'=> 60,
+   'errorRetry'=> false,
 ]);
 ```
 
@@ -150,6 +152,8 @@ $result = $asyncModel->asyncCall([
 |retryIntervalTime| int   | 否 | 当结果为false延时执行的间隔时间，单位秒|
 |retryStopAt| datetime  | 否| 延时执行的停止执行时间 Y-m-d h:i:s |
 |forceSync| bool  | 否| 强制同步执行,默认false |
+|ttr| int  |  否| 最大执行一个任务的时间，默认60|
+|errorRetry| bool  |  否| 任务出错后是否重试 ，默认false |
 
 ## 订制命令解析
 
