@@ -33,7 +33,7 @@ class ORMCommand implements CommandInterface
      *
      * @var
      */
-    protected $status = '';
+//    protected $status = '';
 
     /**
      * Author:Robert
@@ -104,7 +104,7 @@ class ORMCommand implements CommandInterface
     public function getModelInstance()
     {
         if (!isset($this->commands['model']) || !isset($this->commands['method']) || !isset($this->commands['modelParams']) || !isset($this->commands['methodParams'])) {
-            $this->status = CommandInterface::BURY_RESULT_STATUS;
+//            $this->status = CommandInterface::BURY_RESULT_STATUS;
             $this->setError('参数不完整，无法解析当前当前调用');
             return false;
         }
@@ -112,12 +112,12 @@ class ORMCommand implements CommandInterface
             $this->commands['methodParams'] = [];
         }
         if (!$this->commands['model'] || !$this->commands['method']) {
-            $this->status = CommandInterface::BURY_RESULT_STATUS;
+//            $this->status = CommandInterface::BURY_RESULT_STATUS;
             $this->setError('参数为空，无法解析当前当前调用');
             return false;
         }
         if (class_exists($this->commands['model']) === false) {
-            $this->status = CommandInterface::BURY_RESULT_STATUS;
+//            $this->status = CommandInterface::BURY_RESULT_STATUS;
             $this->setError('Model not exist');
             return false;
         }
@@ -127,17 +127,17 @@ class ORMCommand implements CommandInterface
             $model = new $this->commands['model']();
         }
         if (!$model) {
-            $this->status = CommandInterface::BURY_RESULT_STATUS;
+//            $this->status = CommandInterface::BURY_RESULT_STATUS;
             $this->setError('Model not exist');
             return false;
         }
         if (!$model instanceof ORMModelInterface) {
-            $this->status = CommandInterface::BURY_RESULT_STATUS;
+//            $this->status = CommandInterface::BURY_RESULT_STATUS;
             $this->setError('Illegal model,your instance must implement from \Janfish\Phalcon\AsyncCaller\Command\ORMModelInterface');
             return false;
         }
         if (method_exists($model, $this->commands['method']) === false) {
-            $this->status = CommandInterface::BURY_RESULT_STATUS;
+//            $this->status = CommandInterface::BURY_RESULT_STATUS;
             $this->setError('Method not exist');
             return false;
         }
@@ -226,10 +226,10 @@ class ORMCommand implements CommandInterface
      *
      * @return string
      */
-    public function getStatus(): string
-    {
-        return $this->status;
-    }
+//    public function getStatus(): string
+//    {
+//        return $this->status;
+//    }
 
     /**
      * Author:Robert

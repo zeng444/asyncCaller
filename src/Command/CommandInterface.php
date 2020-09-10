@@ -62,7 +62,7 @@ interface CommandInterface
      *
      * @return string
      */
-    public function getStatus(): string;
+//    public function getStatus(): string;
 
     /**
      * 执行的对象实例
