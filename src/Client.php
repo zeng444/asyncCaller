@@ -115,6 +115,12 @@ class Client
         if (!isset($params['forceSync']) || !$params['forceSync']) {
             $params['forceSync'] = false;
         }
+        if (!isset($params['errorRetry']) || !$params['errorRetry']) {
+            $params['errorRetry'] = false;
+        }
+        if (!isset($params['noRetry']) || !$params['noRetry']) {
+            $params['noRetry'] = false;
+        }
         if (!$params['model'] || !class_exists($params['model'])) {
             $this->errorMsg = '不存在的模型对象'.$params['model'];
             return false;
@@ -146,7 +152,8 @@ class Client
             'method' => $params['method'],
             'modelParams' => $params['modelParams'],
             'methodParams' => $params['methodParams'],
-            'errorRetry' =>  $params['errorRetry'] ?? false,
+            'errorRetry' =>  $params['errorRetry'],
+            'noRetry' =>  $params['noRetry'],
             'priority' => time(),
             'retryIntervalTime' => $retryIntervalTime,
             'retryStopAt' => $params['retryStopAt'],

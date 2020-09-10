@@ -172,27 +172,41 @@ class ORMCommand implements CommandInterface
      *
      * @return bool
      */
+//    public function execute(): bool
+//    {
+//        if ($this->call() === true) {
+//            $this->status = CommandInterface::DELETE_RESULT_STATUS;
+//            return true;
+//        }
+//        if ($this->commands['noRetry'] === false) {
+//            if (isset($this->commands['retryIntervalTime']) && $this->commands['retryIntervalTime'] > 0) {
+//                if (isset($this->commands['retryStopAt']) && time() > strtotime($this->commands['retryStopAt'])) {
+//                    $this->setError($this->getError().' - 重新发布的任务结束，达到最大重试时间点'.$this->commands['retryStopAt']);
+//                    $this->status = CommandInterface::DELETE_RESULT_STATUS;
+//                }else{
+//                    $this->setError($this->getError().' - 重新发布，延时'.$this->commands['retryIntervalTime'].'秒后重新执行');
+//                    $this->retryIntervalTime = intval($this->commands['retryIntervalTime']);
+//                    $this->status = CommandInterface::RELEASE_RESULT_STATUS;
+//                }
+//            } else {
+//                $this->setError($this->getError());
+//                $this->status = CommandInterface::BURY_RESULT_STATUS;
+//            }
+//        } else {
+//            $this->setError($this->getError());
+//            $this->status = CommandInterface::DELETED_RESULT_STATUS;
+//        }
+//        return false;
+//    }
+
+    /**
+     * Author:Robert
+     *
+     * @return bool
+     */
     public function execute(): bool
     {
-        if ($this->call() === false) {
-            if (isset($this->commands['retryIntervalTime']) && $this->commands['retryIntervalTime'] > 0) {
-                if (isset($this->commands['retryStopAt']) && time() > strtotime($this->commands['retryStopAt'])) {
-                    $this->setError($this->getError().' - 重新发布的任务结束，达到最大重试时间点'.$this->commands['retryStopAt']);
-                    $this->status = CommandInterface::DELETE_RESULT_STATUS;
-                    return false;
-                }
-                $this->setError($this->getError().' - 重新发布，延时'.$this->commands['retryIntervalTime'].'秒后重新执行');
-                $this->retryIntervalTime = intval($this->commands['retryIntervalTime']);
-                $this->status = CommandInterface::RELEASE_RESULT_STATUS;
-                return false;
-            } else {
-                $this->setError($this->getError());
-                $this->status = CommandInterface::BURY_RESULT_STATUS;
-                return false;
-            }
-        }
-        $this->status = CommandInterface::DELETE_RESULT_STATUS;
-        return true;
+        return $this->call();
     }
 
 
@@ -201,10 +215,10 @@ class ORMCommand implements CommandInterface
      *
      * @return mixed
      */
-    public function getCalledInstance()
-    {
-        return $this->calledInstance;
-    }
+//    public function getCalledInstance()
+//    {
+//        return $this->calledInstance;
+//    }
 
 
     /**

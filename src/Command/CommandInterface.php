@@ -11,11 +11,25 @@ namespace Janfish\Phalcon\AsyncCaller\Command;
 interface CommandInterface
 {
 
+    /**
+     * 任务需要重新发布
+     */
     const RELEASE_RESULT_STATUS = 'RELEASE';
 
+    /**
+     * 任务需要被BUEY
+     */
     const BURY_RESULT_STATUS = 'BURY';
 
+    /**
+     * 任务需要删除
+     */
     const DELETE_RESULT_STATUS = 'DELETE';
+
+    /**
+     * 任务已删除无需处理
+     */
+    const DELETED_RESULT_STATUS = 'DELETED';
 
     /**
      * 执行命令
@@ -40,7 +54,7 @@ interface CommandInterface
      *
      * @return int
      */
-    public function getRetryIntervalTime(): int;
+//    public function getRetryIntervalTime(): int;
 
     /**
      * 执行状态
@@ -56,7 +70,7 @@ interface CommandInterface
      *
      * @return mixed
      */
-    public function getCalledInstance();
+//    public function getCalledInstance();
 
 
     /**
