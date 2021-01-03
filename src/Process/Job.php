@@ -88,14 +88,15 @@ class Job
             }
             if ($data['noRetry'] === true) {
                 $queueService->delete($job);
+                $this->_logger->debug(CommandInterface::DELETED_RESULT_STATUS.' '.json_encode($command->getResultData()).' - '.json_encode($data));
             }
             $result = $command->execute();
-            if ($result) {
-                $this->_logger->debug(CommandInterface::DELETE_RESULT_STATUS.' '.json_encode($command->getResultData()).' - '.json_encode($data));
-                $queueService->delete($job);
-                return true;
-            }
             if ($data['noRetry'] === false) {
+                if ($result) {
+                    $this->_logger->debug(CommandInterface::DELETE_RESULT_STATUS.' '.json_encode($command->getResultData()).' - '.json_encode($data));
+                    $queueService->delete($job);
+                    return true;
+                }
                 if (isset($data['retryIntervalTime']) && $data['retryIntervalTime'] > 0) {
                     if (isset($data['retryStopAt']) && time() > strtotime($data['retryStopAt'])) {
                         $error = $command->getError().' - 重新发布的任务结束，达到最大重试时间点'.$data['retryStopAt'];
@@ -110,8 +111,6 @@ class Job
                     $this->_logger->debug(CommandInterface::BURY_RESULT_STATUS.' '.$command->getError().' - '.json_encode($data));
                     $queueService->bury($job);
                 }
-            } else {
-                $this->_logger->debug(CommandInterface::DELETED_RESULT_STATUS.' '.json_encode($command->getResultData()).' - '.json_encode($data));
             }
             return true;
         } catch (\Exception $e) {
