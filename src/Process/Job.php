@@ -88,7 +88,6 @@ class Job
             }
             if ($data['noRetry'] === true) {
                 $queueService->delete($job);
-                $this->_logger->debug(CommandInterface::DELETED_RESULT_STATUS.' '.json_encode($command->getResultData()).' - '.json_encode($data));
             }
             $result = $command->execute();
             if ($data['noRetry'] === false) {
@@ -111,6 +110,8 @@ class Job
                     $this->_logger->debug(CommandInterface::BURY_RESULT_STATUS.' '.$command->getError().' - '.json_encode($data));
                     $queueService->bury($job);
                 }
+            }else{
+                $this->_logger->debug(CommandInterface::DELETED_RESULT_STATUS.' '.json_encode($command->getResultData()).' - '.json_encode($data));
             }
             return true;
         } catch (\Exception $e) {
