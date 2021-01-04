@@ -110,8 +110,12 @@ class Job
                     $this->_logger->debug(CommandInterface::BURY_RESULT_STATUS.' '.$command->getError().' - '.json_encode($data));
                     $queueService->bury($job);
                 }
-            }else{
-                $this->_logger->debug(CommandInterface::DELETED_RESULT_STATUS.' '.json_encode($command->getResultData()).' - '.json_encode($data));
+            } else {
+                if ($result) {
+                    $this->_logger->debug(CommandInterface::DELETED_RESULT_STATUS.' '.json_encode($command->getResultData()).' - '.json_encode($data));
+                } else {
+                    $this->_logger->debug(CommandInterface::DELETED_RESULT_STATUS.' '.$command->getError().' - '.json_encode($data));
+                }
             }
             return true;
         } catch (\Exception $e) {
